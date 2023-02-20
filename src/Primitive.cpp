@@ -46,19 +46,11 @@ bool Instancer::Instance::boxIntersect(const BBox &other) {
 	return !other.boxIntersection(transformed).isEmpty();
 }
 
-void Instancer::Instance::expandBox(BBox &other) {
-	const BBox transformed {
-		primitive->box.min * scale + offset,
-		primitive->box.max * scale + offset
-	};
-	other.add(transformed);
-}
-
 void Instancer::onBeforeRender() {
 	for (int c = 0; c < instances.size(); c++) {
 		instances[c].primitive->onBeforeRender();
 	}
-	if (instances.size() < 50) {
+	if (instances.size() < 1) {
 		return;
 	}
 

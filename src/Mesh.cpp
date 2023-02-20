@@ -161,12 +161,6 @@ bool TriangleMesh::Triangle::boxIntersect(const BBox& box) {
 	return false;
 }
 
-void TriangleMesh::Triangle::expandBox(BBox& box) {
-	for (int c = 0; c < 3; c++) {
-		box.add(owner->vertices[indices[c]]);
-	}
-}
-
 void TriangleMesh::onBeforeRender() {
 	if (faces.size() < 50) {
 		return;

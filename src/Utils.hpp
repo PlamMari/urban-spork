@@ -5,6 +5,8 @@
 #include <random>
 #include <cassert>
 
+#define sizeofArr(arr) sizeof(arr)/sizeof(arr[0]) 
+
 static const int MAX_RAY_DEPTH = 35;
 const float PI = 3.14159265358979323846;
 
@@ -209,6 +211,21 @@ struct BBox {
 
 	BBox() = default;
 
+	/// @brief Returns the box's center
+	inline vec3 center() const {
+		return (max + min) * 0.5f;
+	}
+
+	inline float surface() const {
+		vec3 edgeLen = max - min;
+		return 2.0f * (edgeLen.x * edgeLen.y + edgeLen.x * edgeLen.z + edgeLen.y * edgeLen.z);
+	}
+
+	inline float volume() const {
+		vec3 edgeLen = max - min;
+		return edgeLen.x * edgeLen.y * edgeLen.z;
+	}
+
 	/// @brief Check if the box is "empty", meaning its size has at lease one negative component
 	bool isEmpty() const {
 		const vec3 size = max - min;
@@ -326,4 +343,24 @@ struct BBox {
 		}
 		return false;
 	}
+
 };
+
+//Morton code int
+inline uint32_t LeftShift3(uint32_t x) {
+	if (x == (1 << 10)) --x;
+	x = (x | (x << 16)) & 0b00000011000000000000000011111111;
+	x = (x | (x << 8)) & 0b00000011000000001111000000001111;
+	x = (x | (x << 4)) & 0b00000011000011000011000011000011;
+	x = (x | (x << 2)) & 0b00001001001001001001001001001001;
+	return x;
+}
+//Morton code vector
+inline uint32_t EncodeMorton3(const vec3& v) {
+	uint32_t x_ = (uint32_t)v.x & ~(-1024);
+	uint32_t y_ = (uint32_t)v.y & ~(-1024);
+	uint32_t z_ = (uint32_t)v.z & ~(-1024);
+	return (LeftShift3(z_) << 2) |
+		(LeftShift3(y_) << 1) |
+		LeftShift3(x_);
+}

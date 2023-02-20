@@ -120,7 +120,6 @@ struct Scene : Task {
 	}
 };
 
-
 void sceneExample(Scene &scene) {
 	scene.name = "example";
 	scene.initImage(800, 600, 4);
@@ -227,18 +226,18 @@ int main(int argc, char *argv[]) {
 		if (arg == -1) {
 			renderCount = sceneCount;
 			firstScene = 0;
-		} else if (arg >= 1 && arg < sceneCount) {
+		} else if (arg >= 0 && arg < sceneCount) {
 			firstScene = arg;
-			renderCount = sceneCount;
+			renderCount = 1;
 		}
 	}
-
+	
 	const int threadCount = std::max<unsigned>(std::thread::hardware_concurrency() - 1, 1);
 	ThreadManager tm(threadCount);
 	tm.start();
 
-	for (int c = 0; c < renderCount; c++) {
-		const int sceneIndex = c + firstScene;
+	for (int c = firstScene; c < firstScene+renderCount; c++) {
+		const int sceneIndex = c;
 		Scene scene;
 		printf("Loading scene...\n");
 		sceneCreators[sceneIndex](scene);

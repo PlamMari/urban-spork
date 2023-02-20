@@ -32,6 +32,9 @@ struct Intersectable {
 	/// @param box [out] - the box to expand
 	virtual void expandBox(BBox &box) = 0;
 
+	/// @brief Returns the bounding box of the intersectable
+	virtual const BBox getBox() const = 0;
+
 	virtual ~Intersectable() = default;
 };
 
@@ -51,6 +54,10 @@ struct Primitive : Intersectable {
 	/// @brief Default implementation adding the whole bbox, overriden for special cases
 	void expandBox(BBox &other) override {
 		other.add(box);
+	}
+
+	const BBox getBox() const override {
+		return box;
 	}
 
 	~Primitive() override = default;
@@ -113,7 +120,18 @@ private:
 
 		bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
 		bool boxIntersect(const BBox &other) override;
-		void expandBox(BBox &other) override;
+
+		inline void expandBox(BBox &other) override {
+			
+			other.add(getBox());
+		}
+
+		inline const BBox getBox() const override {
+			return {
+				primitive->box.min * scale + offset,
+				primitive->box.max * scale + offset
+			};
+		}
 	};
 	std::vector<Instance> instances;
 
